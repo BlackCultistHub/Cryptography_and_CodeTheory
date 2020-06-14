@@ -20,6 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ElGamal_based_BlindSign.cpp" />
+    <ClCompile Include="sha-256.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sha-256.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

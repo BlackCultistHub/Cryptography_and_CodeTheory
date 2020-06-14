@@ -18,5 +18,13 @@
     <ClCompile Include="ElGamal_based_BlindSign.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sha-256.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sha-256.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

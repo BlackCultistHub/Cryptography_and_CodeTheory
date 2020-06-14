@@ -1,14 +1,14 @@
 #include <iostream>
 #include "math.h"
 
-int gcd(int a, int b, int& x, int& y) {
+long long int gcd(long long int a, long long int b, long long int& x, long long int& y) {
     if (a == 0) 
     {
         x = 0; y = 1;
         return b;
     }
-    int x1 = 0, y1 = 0;
-    int d = gcd(b % a, a, x1, y1);
+    long long int x1 = 0, y1 = 0;
+    long long int d = gcd(b % a, a, x1, y1);
     x = y1 - (b / a) * x1;
     y = x1;
     return d;
@@ -23,20 +23,20 @@ long long int modexp(long long int x, long long int y, long long int N)
         return (x * z * z) % N;
 }
 
-int encript(int m, int e, int n)
+long long int encript(long long int m, long long int e, long long int n)
 {
     return modexp(m, e, n);
 }
-int decript(long int m, long int d, long int n)
+long long int decript(long long int m, long long int d, long long int n)
 {
     return modexp(m, d, n);
 }
-int RSAinit(int p, int q, int& e, int& n, int& d)
+long long int RSAinit(long long int p, long long int q, long long int& e, long long int& n, long long int& d)
 {
     int FermNumbers[5] = { 3, 5, 17, 257, 65537 };
-    int f;
-    int x = 0;
-    int y = 0;
+    long long int f;
+    long long int x = 0;
+    long long int y = 0;
     f = (p - 1) * (q - 1); //n eyler function 
     n = p * q;
     for (int i = 4; i >= 0; i--)
@@ -64,12 +64,12 @@ int RSAinit(int p, int q, int& e, int& n, int& d)
 
 int main() 
 {
-    int x = 0, y = 0;
-    int openExp, N, d;
-    int p = 0,
+    long long int x = 0, y = 0;
+    long long int openExp, N, d;
+    long long int p = 0,
         q = 0;
-    int msg = 0;
-    int encr = 0, decr;
+    long long int msg = 0;
+    long long int encr = 0, decr;
     std::cout << "Please enter secret key:\n\tp(int) = ";
     std::cin >> p;
     std::cout << "\tq(int) = ";
