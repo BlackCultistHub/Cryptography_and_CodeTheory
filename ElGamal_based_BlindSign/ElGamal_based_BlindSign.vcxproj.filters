@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlindSign.cpp">
+    <ClCompile Include="ElGamal_based_BlindSign.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
