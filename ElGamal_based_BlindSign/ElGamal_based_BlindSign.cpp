@@ -111,14 +111,6 @@ long long int modexp(long long int x, long long int y, long long int N) // x^y m
         return (x * z * z) % N;
 }
 
-long long int realPower(const long long int a, const long long int degree)
-{
-    long long temp = a;
-    for (int i = 0; i < degree-1; i++)
-        temp *= a;
-    return temp;
-}
-
 int gcd(int a, int b, int& x, int& y) {
     if (a == 0)
     {
@@ -174,66 +166,83 @@ void InitELGamal(long& x, long& y, long& p, long& g)
     }
     y = modexp(g,x,p);
 }
-//int MessageAndSaultInput(long& m, long& s)
-//{
-//    scanf("%d", m);
-//    scanf("%d", s);
-//    return ERROR_OK;
-//}
-int ApplySaultAndHash(long& saultedMasage, long& m, long& s)
-{
 
-    saultedMasage = m << 16;
-    saultedMasage = saultedMasage + s;
-    // TODO add hash
-    return 0;
-}
-int elGamalsign(long& signedMessage, long& unsignedMessage)
+long long superDuperHashFunction(long long msg, long long salt = 0, long module = 3715, int difficulty = 13)
 {
-    return 0;
+    for (int i = 0; i < difficulty; i++)
+    {
+        msg += salt + i;
+        msg %= module;
+    }
+    return msg;
 }
+
 int main()
 {
     try
     {
         long x = 157, y = 0;
         long p = next_prime(getRandomPls(50000)), g = 0;
-        long msg = 101, salt = 0;
+        long msg = 101, salt = 12345;
 
         //-----[ 1 ]-----
-        //std::cout << "Enter secret X (long): ";
-        //std::cin >> x;
+        std::cout << "Enter secret X (long): ";
+        std::cin >> x;
         InitELGamal(x, y, p, g);
         std::cout << "{SK} = {c(" << x << ")} {PK} = {p(" << p << "), g(" << g << "), y(" << y << ")}" << std::endl;
         //-----[ 2 ]-----
-        //std::cout << "Enter message (long): ";
-        //std::cin >> msg;
-        //std::cout << "Enter salt (long): ";
-        //std::cin >> salt;
+        std::cout << "Enter message (long): ";
+        std::cin >> msg;
+        std::cout << "Enter salt (long): ";
+        std::cin >> salt;
         //-----[ 3 ]-----
-        //salting
+        long long saltedMsg = msg + salt + y;
+        std::cout << "Salted with salt and {PK}: " << saltedMsg << std::endl;
+        long long hashedMsg = superDuperHashFunction(saltedMsg);
+        std::cout << "Hashed salted msg: " << hashedMsg << std::endl;
         //-----[ 4 ]-----
         long k = next_prime(getRandomPls(45000));
         long r = modexp(g, k, p);
-        long s = (msg - x * r) * getMultiplBack(k, p-1) % (p-1);
-        std::cout << "{SIGN} = {r(" << r << "), s(" << s << ")} {CHECK} = {PK}" << std::endl;
+        long long mins = hashedMsg - x * r;
+        long s = 0;
+        if (mins < 0)
+            while (mins <= 0)
+                mins += p - 1;
+        s = mins * getMultiplBack(k, p - 1) % (p - 1);
+        std::cout << "{SIGN} = {r(" << r << "), s(" << s << ")}" << std::endl;
         //-----[ 5 ]-----
-        //unsalt
+        std::cout << "Transfered:\n" <<
+            "====================\n" <<
+            "Message(" << msg << "),\n" <<
+            "Salt(" << salt << "),\n" <<
+            "{SIGN} = { r(" << r << "), s(" << s << ")},\n" <<
+            "{PK} = {p(" << p << "), g(" << g << "), y(" << y << ")}\n" << 
+            "====================" << std::endl;
+        long long unsaltedMsg = msg + salt + y;
+        std::cout << "Unsalted with salt and {PK}: " << unsaltedMsg << std::endl;
+        long long RhashedMsg = superDuperHashFunction(saltedMsg);
+        std::cout << "Hashed unsalted msg: " << RhashedMsg << std::endl;
         //-----[ 6 ]-----
+        std::cout << "Checking sign..." << std::endl;
         //1. check r/s
         if (r <= 0 || r >= p)
             throw "Sign check failed by checking r.";
-        else if (s <= 0 || s >= p - 1)
+        std::cout << "r-value OK." << std::endl;
+        if (s <= 0 || s >= p - 1)
             throw "Sign check failed by checking s.";
-        //check hash
-        //checking math
-        if (realPower(y, r) * realPower(r, s) % p != modexp(g, msg, p))
+        std::cout << "s-value OK." << std::endl;
+        //2. checking math
+        if (modexp(y, r, p) * modexp(r, s, p) % p!= modexp(g, RhashedMsg, p))
             throw "Sign check failed by math check.";
+        std::cout << "Math OK." << std::endl;
+        std::cout << "{SIGN} OK!" << std::endl;
         return 0;
     }
-    catch (std::string& exception)
+    catch (const char* exception)
     {
+        std::cout << "\n=====[ EXCEPTION ]=====" << std::endl;
         std::cout << exception << std::endl;
+        std::cout << "=======================" << std::endl;
         return -1;
     }
 }

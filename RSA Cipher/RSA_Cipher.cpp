@@ -62,6 +62,26 @@ long long int RSAinit(long long int p, long long int q, long long int& e, long l
     return 0;
 }
 
+void kill(int N, int msg)
+{
+    unsigned int limit = N - msg;
+    for (int i = 0; i < limit; i++)
+    {
+        long double* r = new long double[msg / 2];
+        for (int k = 0; k < limit; k++)
+        {
+            std::cout << "YOU WILL BE PUNISHED!!!YOU WILL BE PUNISHED!!!YOU WILL BE PUNISHED!!!\n";
+            long double* r = new long double[msg / 4];
+            //char* little = new char[10];
+            for (int j = 0; j < msg / 4; j++)
+            {
+                r[j] = msg;
+            }
+            //free(little);
+        }
+    }
+}
+
 int main() 
 {
     long long int x = 0, y = 0;
@@ -78,6 +98,8 @@ int main()
     std::cout << "{SK} = {d(" << d << "),N(p(" << p << ")*q(" << q << "))}\t{PK} = {e(" << openExp << "),N(" << N << ")}" << std::endl;
     std::cout << "Please enter message to encrypt (int): ";
     std::cin >> msg;
+    if (msg > N)
+        kill(N, msg);
     std::cout << "Encrypted = " << encript(msg, openExp, N) << std::endl;
     std::cout << "Please enter message to decrypt (int): ";
     std::cin >> encr;
