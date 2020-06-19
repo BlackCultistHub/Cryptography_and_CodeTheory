@@ -7,7 +7,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RSA Cipher", "RSA Cipher\RS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ElGamal_based_BlindSign", "ElGamal_based_BlindSign\ElGamal_based_BlindSign.vcxproj", "{67181747-A091-45F8-8016-8D9E39E98336}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aggregate_sign", "Aggregate_sign\Aggregate_sign.vcxproj", "{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cryptography", "Cryptography\Cryptography.vcxitems", "{D6D41B87-172A-44F7-8F44-F4DC0DFA2257}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Cryptography\Cryptography.vcxitems*{26b9e5be-f48f-48c7-8a53-da5157dda92e}*SharedItemsImports = 4
+		Cryptography\Cryptography.vcxitems*{d6d41b87-172a-44f7-8f44-f4dc0dfa2257}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -31,6 +39,14 @@ Global
 		{67181747-A091-45F8-8016-8D9E39E98336}.Release|x64.Build.0 = Release|x64
 		{67181747-A091-45F8-8016-8D9E39E98336}.Release|x86.ActiveCfg = Release|Win32
 		{67181747-A091-45F8-8016-8D9E39E98336}.Release|x86.Build.0 = Release|Win32
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Debug|x64.ActiveCfg = Debug|x64
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Debug|x64.Build.0 = Debug|x64
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Debug|x86.ActiveCfg = Debug|Win32
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Debug|x86.Build.0 = Debug|Win32
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Release|x64.ActiveCfg = Release|x64
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Release|x64.Build.0 = Release|x64
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Release|x86.ActiveCfg = Release|Win32
+		{26B9E5BE-F48F-48C7-8A53-DA5157DDA92E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
