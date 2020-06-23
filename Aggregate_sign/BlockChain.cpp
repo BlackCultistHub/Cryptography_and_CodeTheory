@@ -42,9 +42,11 @@ namespace BlockChain {
 		}
 		//generating sign
 		std::vector<RSA::RSA_secret_keypair> SKs;
-		getKeys(SKs);
+		std::vector<long long int> ids;
+		getKeys(SKs, ids, transactions_.size());		
 		long long sign = ACSign::sign(SKs, hashes, sign_setting);
-		chain.push_back(block(transactions_, sign, prevId, takeId()));
+
+		chain.push_back(block(transactions_, ids, sign, prevId, takeId()));
 		return true;
 	}
 
@@ -52,11 +54,16 @@ namespace BlockChain {
 	{
 		std::vector<long long int> hashes;
 		std::vector<RSA::RSA_open_keypair> PKs;
-		getKeys(PKs);
 		for (auto it = chain.begin(); it < chain.end(); it++)
 		{
 			if (it->block_id == blockId)
 			{
+				std::vector<long long int> ids;
+				for (int i = 0; i < it->key_ids.size(); i++)
+				{
+					ids.push_back(it->key_ids[i]);
+				}
+				getKeys(PKs, ids);
 				for (int i = 0; i < it->transactions.size(); i++)
 					hashes.push_back(cryptoMath::superDuperHashFunction(it->transactions[i]));
 				return ACSign::checkSign(PKs, hashes, it->sign);
@@ -97,7 +104,7 @@ namespace BlockChain {
 		return Ids;
 	}
 
-	void BlockChain::getBlockInfo(long long int id, long long int& previous_block_id, std::vector< long long int>& transactions, long long int& sign)
+	void BlockChain::getBlockInfo(long long int id, long long int& previous_block_id, std::vector< long long int>& transactions, std::vector< long long int>& keyIds, long long int& sign)
 	{
 		for (int i = 0; i < chain.size(); i++)
 		{
@@ -107,6 +114,8 @@ namespace BlockChain {
 				sign = chain[i].sign;
 				for (int j = 0; j < chain[i].transactions.size(); j++)
 					transactions.push_back(chain[i].transactions[j]);
+				for (int j = 0; j < chain[i].key_ids.size(); j++)
+					keyIds.push_back(chain[i].key_ids[j]);
 			}
 		}
 	}
@@ -131,20 +140,42 @@ namespace BlockChain {
 		return randId;
 	}
 
-	void BlockChain::getKeys(std::vector<RSA::RSA_secret_keypair>& secret_keys)
+	void BlockChain::getKeys(std::vector<RSA::RSA_secret_keypair>& secret_keys, std::vector<long long int>& ids, long long int transactions_amount)
 	{
-		for (int i = 0; i < keys.size(); i++)
+		std::vector<dataBaseKey> usedKeys;
+		long long keysAmount = transactions_amount + 2 > keys.size() ? transactions_amount : transactions_amount + 2;
+		for (int i = 0; i < keysAmount; i++)
 		{
-			secret_keys.push_back(keys[i].secret_key);
+			auto UniqueKey = [usedKeys](dataBaseKey toCheck)
+			{
+				for (int i = 0; i < usedKeys.size(); i++)
+				{
+					if (usedKeys[i].id == toCheck.id)
+						return false;
+				}
+				return true;
+			};
+
+			dataBaseKey keyToGo = keys[rand() % keys.size()];
+			while (!UniqueKey(keyToGo))
+				keyToGo = keys[rand() % keys.size()];
+			usedKeys.push_back(keyToGo);
+			secret_keys.push_back(keyToGo.secret_key);
+			//getting key's ids
+			ids.push_back(keyToGo.id);
 		}
 	}
 
-	void BlockChain::getKeys(std::vector<RSA::RSA_open_keypair>& public_keys)
+	void BlockChain::getKeys(std::vector<RSA::RSA_open_keypair>& public_keys, std::vector<long long int> ids)
 	{
-		for (int i = 0; i < keys.size(); i++)
+		for (int i = 0; i < ids.size(); i++)
 		{
-			public_keys.push_back(keys[i].public_key);
-		}
+			for (int j = 0; j < keys.size(); j++)
+			{
+				if (keys[j].id == ids[i])
+					public_keys.push_back(keys[j].public_key);
+			}
+		}		
 	}
 
 }

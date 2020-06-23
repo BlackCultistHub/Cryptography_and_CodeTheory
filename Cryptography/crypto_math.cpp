@@ -16,7 +16,7 @@ namespace cryptoMath {
         return d;
     }
 
-    long long int modexp(long long int x, long long int y, long long int N)
+    /*long long int modexp(long long int x, long long int y, long long int N)
     {
         if (y == 0) return 1;
         long long int z = modexp(x, y / 2, N);
@@ -24,6 +24,32 @@ namespace cryptoMath {
             return (z * z) % N;
         else
             return (x * z * z) % N;
+    }*/
+
+    //long long int modexp(long long int num, long long int pow, long long int mod)
+    //{
+    //    unsigned long long test;
+    //    unsigned long long n = num;
+    //    for (test = 1; pow; pow >>= 1)
+    //    {
+    //        if (pow & 1)
+    //            test = ((test % mod) * (n % mod)) % mod;
+    //        n = ((n % mod) * (n % mod)) % mod;
+    //    }
+
+    //    return test; /* note this is potentially lossy */
+    //}
+
+    long long int modexp(long long x, long long n, long long mod)
+    {
+        long long result = 1;
+        while (n) {
+            if (n & 1)
+                result = result * x % mod;
+            n = n / 2;
+            x = x * x % mod;
+        }
+        return result;
     }
 
     int getMultiplBack(int a, int mod)

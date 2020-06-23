@@ -9,6 +9,10 @@
 //winapi
 #include <Windows.h>
 
+#define GEN_LOWEST 100
+#define GEN_MODULE 337
+#define GEN_TRANSACTION_MODULE 257
+
 typedef std::pair<long long int, long long int> secret_pair;
 
 namespace graphics {
@@ -96,6 +100,26 @@ int main()
 		cout << "*[ keys autogen 1 ]**************************" << endl;
 		cout << "Input: ";
 		cin >> keysAmount;
+		if (keysAmount == 0)
+		{
+			system("cls");
+			cout << "*********[ BlockChain via AC Sign ]**********" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*        Keys cannot be created with        *" << endl;
+			cout << "*              no secret pairs!             *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*                                           *" << endl;
+			cout << "*[ keys autogen 1 ]***************************" << endl;
+			cout << "Press any key to return...";
+			_getch();
+			system("cls");
+			goto main;
+		}
 		system("cls");
 		cout << "*********[ BlockChain via AC Sign ]**********" << endl;
 		cout << "*                                           *" << endl;
@@ -135,7 +159,7 @@ int main()
 					cout << "*                                           *" << endl;
 					cout << "*      Press 0 to exit                      *" << endl;
 					cout << "*                                           *" << endl;
-					cout << "*[ keys manual 2 ]***************************" << endl;
+					cout << "*[ keys manual 1 ]***************************" << endl;
 					cout << "Input: ";
 					cin >> inp1;
 					system("cls");
@@ -258,11 +282,13 @@ int main()
 		cout << "*                                           *" << endl;
 		cout << "*                                           *" << endl;
 		cout << "*                                           *" << endl;
-		cout << "*                                           *" << endl;
+		cout << "*      Press 0 to exit                      *" << endl;
 		cout << "*                                           *" << endl;
 		cout << "*[ block auto 1 ]****************************" << endl;
 		cout << "Input: ";
 		cin >> keysAmount;
+		if (keysAmount == 0)
+			goto blockchain;
 		system("cls");
 		logic::bcAutoGen(keysAmount, docs_input, chain);
 		goto blockchain;
@@ -383,7 +409,7 @@ namespace graphics {
 		std::cout << "\t\t*                           SUAI group 3745 *" << std::endl;
 		std::cout << "\t\t*                                           *" << std::endl;
 		std::cout << "\t\t*********[ Saint-Petersburg, 2020 ]**********" << std::endl;
-		Sleep(10000);
+		Sleep(4000);
 		system("cls");
 	}
 
@@ -409,23 +435,30 @@ namespace graphics {
 		long long prevId = 0,
 			   	  sign = 0;
 		std::vector<long long int> transactions;
+		std::vector<long long int> keyIds;
 		std::vector<long long int> blocks = chain.scanChain();
 		cout << "*********[ BlockChain via AC Sign ]**********" << endl;
 		cout << "|" << endl;
 		for (int i = 0; i < blocks.size(); i++)
 		{
-			chain.getBlockInfo(blocks[i], prevId, transactions, sign);
+			chain.getBlockInfo(blocks[i], prevId, transactions, keyIds, sign);
 			cout << "|    |=====[ Block #" << blocks[i] << ": ]=====" << endl;
 			//cout << "|	  | Block #" << blocks[i] << ":" << endl;
-			cout << "|	  |   Previous block: " << prevId << endl;
-			cout << "|	  |   Sign: " << sign << endl;
-			cout << "|	  |   Transactions: " << endl;
+			cout << "|    |   Previous block: " << prevId << endl;
+			cout << "|    |   Sign: " << sign << endl;
+			cout << "|    |   Transactions: " << endl;
 			for (int j = 0; j < transactions.size(); j++)
 			{
-				cout << "|	  |     #" << j << ":" << transactions[j] << endl;
+				cout << "|    |      |TR#" << j << ":" << transactions[j] << endl;
 			}
 			transactions.clear();
+			cout << "|    |   Keys(id): " << endl;
+			for (int j = 0; j < keyIds.size(); j++)
+			{
+				cout << "|    |      |KEY#" << j << ":" << keyIds[j] << endl;
+			}
 		}
+		cout << "|" << endl;
 		cout << "*[ block show ]******************************" << endl;
 		//cout << "Press any key to return...";
 		//_getch();
@@ -472,6 +505,7 @@ namespace graphics {
 		{
 			cout << "*      id " << blocks[i] << "-->>" << endl;
 		}
+		cout << "*                                           *" << endl;
 		cout << "*      Press 0 to exit                      *" << endl;
 		cout << "*                                           *" << endl;
 		cout << "*[ check block ]*****************************" << endl;
@@ -479,13 +513,14 @@ namespace graphics {
 		cin >> inp;
 		if (inp == 0)
 			return;
+		system("cls");
+		cout << "*********[ BlockChain via AC Sign ]**********" << endl;
+		cout << "*                                           *" << endl;
+		cout << "*           Sign check by block.            *" << endl;
+		cout << "*             Checking...                   *" << endl;
+		cout << "*                                           *" << endl;
 		if (chain.checkBlock(inp))
 		{
-			system("cls");
-			cout << "*********[ BlockChain via AC Sign ]**********" << endl;
-			cout << "*                                           *" << endl;
-			cout << "*           Sign check by block.            *" << endl;
-			cout << "*                                           *" << endl;
 			cout << "*            Block Valid. OK                *" << endl;
 			cout << "*                                           *" << endl;
 			cout << "*         1. Go to block list               *" << endl;
@@ -511,11 +546,6 @@ namespace graphics {
 		}
 		else
 		{
-			system("cls");
-			cout << "*********[ BlockChain via AC Sign ]**********" << endl;
-			cout << "*                                           *" << endl;
-			cout << "*           Sign check by block.            *" << endl;
-			cout << "*                                           *" << endl;
 			cout << "*            Block Invalid! BAD             *" << endl;
 			cout << "*                                           *" << endl;
 			cout << "*         1. Go to block list               *" << endl;
@@ -546,23 +576,38 @@ namespace logic {
 
 	void autoGen(int amount, std::vector<RSA::RSA_secret_keypair>& secret_keys, std::vector<RSA::RSA_open_keypair>& public_keys)
 	{
-		for (int i = 0; i < amount; i++)
+		for (int keyToGen = 0; keyToGen < amount; keyToGen++)
 		{
+			auto uniqueKey = [secret_keys](long long backExp)
+			{
+				for (int i = 0; i < secret_keys.size(); i++)
+				{
+					if (secret_keys[i].d == backExp)
+						return false;
+				}
+				return true;
+			};
+			
 			long long exp;
 			long long mod;
-			long long backExp;
+			long long backExp = 0;
 			long long rnumbP = 0;
-			while(rnumbP < 50)
-				rnumbP = rand() % 333;
-			long long primeP = cryptoMath::GetNextPrime(rnumbP);
-			long long rnumbQ = 0;
-			while(rnumbQ < 50)
-				rnumbQ = rand() % 333;
-			long long primeQ = cryptoMath::GetNextPrime(rnumbQ);
-			RSA::keyGen(primeP, primeQ, exp, mod, backExp);
+			do
+			{
+				while (rnumbP < GEN_LOWEST)
+					rnumbP = rand() % GEN_MODULE;
+				long long primeP = cryptoMath::GetNextPrime(rnumbP);
+				long long rnumbQ = 0;
+				while (rnumbQ < GEN_LOWEST)
+					rnumbQ = rand() % GEN_MODULE;
+				long long primeQ = cryptoMath::GetNextPrime(rnumbQ);
+
+				RSA::keyGen(primeP, primeQ, exp, mod, backExp);
+			} while (!uniqueKey(backExp));
 			RSA::RSA_open_keypair openKey(exp, mod);
-			public_keys.push_back(openKey);
 			RSA::RSA_secret_keypair secretKey(backExp, mod);
+
+			public_keys.push_back(openKey);
 			secret_keys.push_back(secretKey);
 		}
 	}
@@ -584,7 +629,7 @@ namespace logic {
 	void bcAutoGen(int amount, std::vector<long long int>& docs_input, BlockChain::BlockChain& chain)
 	{
 		for (int i = 0; i < amount; i++)
-			docs_input.push_back(rand()%337);
+			docs_input.push_back(rand()% GEN_TRANSACTION_MODULE);
 		chain.addBlock(docs_input);
 		docs_input.clear();
 	}
