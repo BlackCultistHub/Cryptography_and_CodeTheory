@@ -1,6 +1,6 @@
 #include "crypto_math.h"
 
-namespace cyptoMath {
+namespace cryptoMath {
 
     long long int gcd(long long int a, long long int b, long long int& x, long long int& y)
     {
@@ -59,7 +59,7 @@ namespace cyptoMath {
         return 0;
     }
 
-    long long superDuperHashFunction(long long msg, long long salt = 0, long module = 3715, int difficulty = 13)
+    long long superDuperHashFunction(long long msg, long long salt, long module, int difficulty)
     {
         for (int i = 0; i < difficulty; i++)
         {

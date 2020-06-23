@@ -78,21 +78,38 @@ namespace ACSign {
 		}
 	}
 
-	long long sign(std::vector<RSA::RSA_secret_keypair> keys, std::vector<long long int> hashes, int setting=0) // setting = 2 for disable; 1 for let keys>hashes
+	void fillHashes(std::vector<long long int>& hashes, int target_size, int setting = 0) //0 for copies; 1 for one's
+	{
+		if (target_size > hashes.size())
+		{
+			if (setting == 0)
+			{
+				int initial_size = hashes.size();
+				while (target_size > hashes.size())  //dublicate docs if need
+					hashes.push_back(hashes[hashes.size() - initial_size]);
+			}
+			else if (setting == 1)
+			{
+				for (int hash = 0 + (target_size - (target_size - hashes.size())); hash < target_size; hash++) //make not used hashes as 1
+					hashes.push_back(1);
+			}
+		}
+	}
+
+	long long sign(std::vector<RSA::RSA_secret_keypair> keys, std::vector<long long int> hashes, int setting) // setting = 2 for disable; 1 for let keys>hashes
 	{
 		if ((hashes.size() > keys.size()) && setting <= 1)
 			throw std::exception("Error creating ACSign. Recieved too many hashes.");
 		if ((keys.size() > hashes.size()) && setting == 0)
 			throw std::exception("Error creating ACSign. Recieved too many keys.");
 		if (keys.size() > hashes.size())
-			for (int hash = 0 + (keys.size() - (keys.size() - hashes.size())); hash < hashes.size(); hash++) //make not used hashes as 1
-				hashes[hash] = 1;
+			fillHashes(hashes, keys.size());
 		std::vector<long long int> signs;
 		sortKeysFromLowToHigh(keys);
 		for (int keypair = 0; keypair < keys.size(); keypair++)
 		{
 			//Sm = (Sm-1 * Hm)^dm mod Nm
-			long long multiplication = keypair == 0 ? 1 : signs.back() * hashes[keypair];
+			long long multiplication = keypair == 0 ? hashes[keypair] : signs.back() * hashes[keypair];
 			long long signM = cryptoMath::modexp(multiplication, keys[keypair].d, keys[keypair].N);
 			signs.push_back(signM);
 		}
@@ -101,19 +118,22 @@ namespace ACSign {
 
 	bool checkSign(std::vector<RSA::RSA_open_keypair> keys, std::vector<long long int> hashes, long long sign)
 	{
-		std::vector<long long int> signs;
+		//fill hashes
+		if (keys.size() > hashes.size())
+			fillHashes(hashes, keys.size());
 		//sort backwards
 		sortKeysFromHighToLow(keys);
+		long long last_sign = sign;
 		for (int keypair = 0; keypair < keys.size()-1; keypair++) // -1?????
 		{
 			//Sm-1 = (Sm^em) * Hm(-1) mod Nm = (Sm^em mod N * Hm(-1) mod Nm) mod Nm = (mod1 * mod2) mod Nm
-			long long mod1 = cryptoMath::modexp(keypair == 0 ? sign : signs.back(), keys[keypair].e, keys[keypair].N);
-			long long mod2 = cryptoMath::getMultiplBack(hashes[keys.size() - keypair -1], keys[keypair].N) % keys[keypair].N; // -1?????
-			long long signMinusOne = (mod1 * mod2) % keys[keypair].N;
+			long long mod1 = cryptoMath::modexp(keypair == 0 ? sign : last_sign, keys[keypair].e, keys[keypair].N);
+			long long mod2 = cryptoMath::getMultiplBack(hashes[keys.size() - keypair - 1], keys[keypair].N); // -1?????
+			last_sign = (mod1 * mod2) % keys[keypair].N;
 		}
 		long long HashXBase = hashes[0] % keys.back().N;
 		//Hx = S1^e1 mod N1
-		long long HashX = cryptoMath::modexp(signs.back(), keys.back().e, keys.back().N);
+		long long HashX = cryptoMath::modexp(last_sign, keys.back().e, keys.back().N);
 		if (HashXBase == HashX)
 			return true;
 		else
