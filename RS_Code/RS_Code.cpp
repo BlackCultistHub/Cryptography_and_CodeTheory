@@ -26,7 +26,7 @@ int main()
     std::vector<unsigned char> msg;
 
     cout << "Enter input vector's numbers for GF(16) one by one. -1 to end." << endl;
-    while (true)
+    while (msg.size() < 7)
     {
         cin >> inp;
         if (inp == -1)
