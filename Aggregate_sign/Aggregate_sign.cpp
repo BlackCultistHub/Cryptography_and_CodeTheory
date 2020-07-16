@@ -9,11 +9,15 @@
 //winapi
 #include <Windows.h>
 
+// 100 337 257
+
 #define GEN_LOWEST 100
+#define GEN_MAX 
 #define GEN_MODULE 337
 #define GEN_TRANSACTION_MODULE 257
+#define GEN_CHECK_MSG 257
 
-typedef std::pair<long long int, long long int> secret_pair;
+typedef std::pair<unsigned long long int, unsigned long long int> secret_pair;
 
 namespace graphics {
 
@@ -30,8 +34,8 @@ namespace logic {
 	void autoGen(int amount, std::vector<RSA::RSA_secret_keypair>& secret_keys,	std::vector<RSA::RSA_open_keypair>& public_keys);
 	void inputKeys(std::vector<secret_pair> secret_input, std::vector<RSA::RSA_secret_keypair>& secret_keys, std::vector<RSA::RSA_open_keypair>& public_keys);
 
-	void bcAutoGen(int amount, std::vector<long long int>& docs_input, BlockChain::BlockChain& chain);
-	void bcInput(std::vector<long long int>& docs_input, BlockChain::BlockChain& chain);
+	void bcAutoGen(int amount, std::vector<unsigned long long int>& docs_input, BlockChain::BlockChain& chain);
+	void bcInput(std::vector<unsigned long long int>& docs_input, BlockChain::BlockChain& chain);
 }
 
 
@@ -45,12 +49,12 @@ int main()
 
 		//variables
 		int keysAmount = 0;
-		long long inp1 = 0, inp2 = 0;
+		unsigned long long inp1 = 0, inp2 = 0;
 		int i = 0;
 		bool input = true;
 		//data inputs
 		std::vector<secret_pair> secret_input;
-		std::vector<long long int> docs_input;
+		std::vector<unsigned long long int> docs_input;
 		//keys
 		std::vector<RSA::RSA_secret_keypair> secret_keys;
 		std::vector<RSA::RSA_open_keypair> public_keys;
@@ -409,6 +413,17 @@ namespace graphics {
 		std::cout << "\t\t*                           SUAI group 3745 *" << std::endl;
 		std::cout << "\t\t*                                           *" << std::endl;
 		std::cout << "\t\t*********[ Saint-Petersburg, 2020 ]**********" << std::endl;
+		//alone ver
+		/*std::cout << "\t\t*********[ BlockChain via AC Sign ]**********" << std::endl;
+		std::cout << "\t\t*                                           *" << std::endl;
+		std::cout << "\t\t*      BlockChain via Aggregate Sign        *" << std::endl;
+		std::cout << "\t\t*         by BlackCultist(Makarsky A.A.)    *" << std::endl;
+		std::cout << "\t\t*                                           *" << std::endl;
+		std::cout << "\t\t*                                           *" << std::endl;
+		std::cout << "\t\t*                                           *" << std::endl;
+		std::cout << "\t\t*                           SUAI group 3745 *" << std::endl;
+		std::cout << "\t\t*                                           *" << std::endl;
+		std::cout << "\t\t*********[ Saint-Petersburg, 2020 ]**********" << std::endl;*/
 		Sleep(4000);
 		system("cls");
 	}
@@ -423,6 +438,20 @@ namespace graphics {
 		{
 			cout << "|       Key #"<< i <<": d="<< secret_keys[i].d <<", e="<< public_keys[i].e <<", N=" << public_keys[i].N << endl;
 		}
+		cout << "|" << endl;
+		cout << "|       BAD KEYS: " << endl;
+		std::vector<int> badKeysId;
+		for (int i = 0; i < secret_keys.size(); i++)
+		{
+			long long testMsg = GEN_CHECK_MSG;
+			long long E = RSA::encript(testMsg, public_keys[i].e, public_keys[i].N);
+			long long D = RSA::decript(E, secret_keys[i].d, secret_keys[i].N);
+			if (testMsg != D)
+				badKeysId.push_back(i);
+		}
+		for (int i = 0; i < badKeysId.size(); i++)
+			cout << "|    Key#" << badKeysId[i] << endl;
+		cout << "|" << endl;
 		cout << "*[ key show ]********************************" << endl;
 		//cout << "Press any key to return...";
 		//_getch();
@@ -432,11 +461,11 @@ namespace graphics {
 	{
 		using std::cout;
 		using std::endl;
-		long long prevId = 0,
-			   	  sign = 0;
-		std::vector<long long int> transactions;
-		std::vector<long long int> keyIds;
-		std::vector<long long int> blocks = chain.scanChain();
+		unsigned long long prevId = 0,
+			   				sign = 0;
+		std::vector<unsigned long long int> transactions;
+		std::vector<unsigned long long int> keyIds;
+		std::vector<unsigned long long int> blocks = chain.scanChain();
 		cout << "*********[ BlockChain via AC Sign ]**********" << endl;
 		cout << "|" << endl;
 		for (int i = 0; i < blocks.size(); i++)
@@ -457,6 +486,8 @@ namespace graphics {
 			{
 				cout << "|    |      |KEY#" << j << ":" << keyIds[j] << endl;
 			}
+			transactions.clear();
+			keyIds.clear();
 		}
 		cout << "|" << endl;
 		cout << "*[ block show ]******************************" << endl;
@@ -492,8 +523,8 @@ namespace graphics {
 		using std::cin;
 		using std::endl;
 	list:
-		long long inp;
-		std::vector<long long int> blocks = chain.scanChain();
+		unsigned long long inp;
+		std::vector<unsigned long long int> blocks = chain.scanChain();
 		system("cls");
 		cout << "*********[ BlockChain via AC Sign ]**********" << endl;
 		cout << "*                                           *" << endl;
@@ -578,7 +609,7 @@ namespace logic {
 	{
 		for (int keyToGen = 0; keyToGen < amount; keyToGen++)
 		{
-			auto uniqueKey = [secret_keys](long long backExp)
+			auto uniqueKey = [secret_keys](unsigned long long backExp)
 			{
 				for (int i = 0; i < secret_keys.size(); i++)
 				{
@@ -587,23 +618,32 @@ namespace logic {
 				}
 				return true;
 			};
+			auto checkValidKey = [](unsigned long long d, unsigned long long e, unsigned long long mod)
+			{
+				unsigned long long msg = GEN_CHECK_MSG;
+				unsigned long long E = RSA::encript(msg, e, mod);
+				unsigned long long D = RSA::decript(E, d, mod);
+				if (msg != D)
+					return false;
+				return true;
+			};
 			
-			long long exp;
-			long long mod;
-			long long backExp = 0;
-			long long rnumbP = 0;
+			unsigned long long exp;
+			unsigned long long mod;
+			unsigned long long backExp = 0;
+			unsigned long long rnumbP = 0;
 			do
 			{
 				while (rnumbP < GEN_LOWEST)
 					rnumbP = rand() % GEN_MODULE;
-				long long primeP = cryptoMath::GetNextPrime(rnumbP);
-				long long rnumbQ = 0;
+				unsigned long long primeP = cryptoMath::GetNextPrime(rnumbP);
+				unsigned long long rnumbQ = 0;
 				while (rnumbQ < GEN_LOWEST)
 					rnumbQ = rand() % GEN_MODULE;
-				long long primeQ = cryptoMath::GetNextPrime(rnumbQ);
+				unsigned long long primeQ = cryptoMath::GetNextPrime(rnumbQ);
 
 				RSA::keyGen(primeP, primeQ, exp, mod, backExp);
-			} while (!uniqueKey(backExp));
+			} while (!(uniqueKey(backExp) && checkValidKey(backExp, exp, mod)));
 			RSA::RSA_open_keypair openKey(exp, mod);
 			RSA::RSA_secret_keypair secretKey(backExp, mod);
 
@@ -616,9 +656,9 @@ namespace logic {
 		//getting keys via RSA
 		for (int i = 0; i < secret_input.size(); i++)
 		{
-			long long exp;
-			long long mod;
-			long long backExp;
+			unsigned long long exp;
+			unsigned long long mod;
+			unsigned long long backExp;
 			RSA::keyGen(secret_input[i].first, secret_input[i].second, exp, mod, backExp);
 			RSA::RSA_open_keypair openKey(exp, mod);
 			public_keys.push_back(openKey);
@@ -626,14 +666,17 @@ namespace logic {
 			secret_keys.push_back(secretKey);
 		}
 	}
-	void bcAutoGen(int amount, std::vector<long long int>& docs_input, BlockChain::BlockChain& chain)
+	void bcAutoGen(int amount, std::vector<unsigned long long int>& docs_input, BlockChain::BlockChain& chain)
 	{
 		for (int i = 0; i < amount; i++)
-			docs_input.push_back(rand()% GEN_TRANSACTION_MODULE);
+		{
+			unsigned long long r = rand() % GEN_TRANSACTION_MODULE;
+			docs_input.push_back(r);
+		}
 		chain.addBlock(docs_input);
 		docs_input.clear();
 	}
-	void bcInput(std::vector<long long int>& docs_input, BlockChain::BlockChain& chain)
+	void bcInput(std::vector<unsigned long long int>& docs_input, BlockChain::BlockChain& chain)
 	{
 		chain.addBlock(docs_input);
 		docs_input.clear();

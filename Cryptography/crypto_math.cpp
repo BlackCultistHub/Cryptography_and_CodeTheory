@@ -2,6 +2,17 @@
 
 namespace cryptoMath {
 
+    bool getBit(unsigned long long code, unsigned int pointer) //pointer [0 - n]
+    {
+        unsigned long long pointerBit = 0, temp = 0;
+        pointerBit = pow(2, pointer);
+        temp = code ^ pointerBit;
+        if (temp < code)
+            return true;
+        else
+            return false;
+    }
+
     long long int gcd(long long int a, long long int b, long long int& x, long long int& y)
     {
         if (a == 0)
@@ -16,43 +27,46 @@ namespace cryptoMath {
         return d;
     }
 
-    /*long long int modexp(long long int x, long long int y, long long int N)
+    unsigned long long int modexp(unsigned long long number, unsigned long long degree, unsigned long long mod)
     {
-        if (y == 0) return 1;
-        long long int z = modexp(x, y / 2, N);
-        if (y % 2 == 0)
-            return (z * z) % N;
-        else
-            return (x * z * z) % N;
-    }*/
-
-    //long long int modexp(long long int num, long long int pow, long long int mod)
-    //{
-    //    unsigned long long test;
-    //    unsigned long long n = num;
-    //    for (test = 1; pow; pow >>= 1)
-    //    {
-    //        if (pow & 1)
-    //            test = ((test % mod) * (n % mod)) % mod;
-    //        n = ((n % mod) * (n % mod)) % mod;
-    //    }
-
-    //    return test; /* note this is potentially lossy */
-    //}
-
-    long long int modexp(long long x, long long n, long long mod)
-    {
-        long long result = 1;
-        while (n) {
-            if (n & 1)
-                result = result * x % mod;
-            n = n / 2;
-            x = x * x % mod;
+        std::vector<unsigned int> degrees;
+        for (int i = 0; i < (sizeof(degree) * 8); i++)
+        {
+            if (getBit(degree, i))
+                degrees.push_back(2);
+            else
+                degrees.push_back(0);
         }
-        return result;
+        std::vector<unsigned long long> multiplication;
+        for (int i = 0; i < degrees.size(); i++) //squaring
+        {
+            if (degrees[i])
+            {
+                if (i == 0)
+                    multiplication.push_back(number);
+                else
+                {
+                    unsigned long long temp = 0;
+                    temp = number;
+                    for (int j = i; j > 0; j--)
+                    {
+                        temp *= temp; //square
+                        temp %= mod; //mod
+                    }
+                    multiplication.push_back(temp);
+                }
+            }
+        }
+        for (size_t i = 0; i < multiplication.size() - 1; i++) //multiplying
+        {
+            multiplication[i + 1] *= multiplication[i]; //multiply
+            multiplication[i + 1] %= mod; //mod
+        }
+
+        return multiplication.back();
     }
 
-    int getMultiplBack(int a, int mod)
+    unsigned long long getMultiplBack(unsigned long long a, unsigned long long mod)
     {
         long long x, y;
         gcd(a, mod, x, y);
@@ -85,7 +99,7 @@ namespace cryptoMath {
         return 0;
     }
 
-    long long superDuperHashFunction(long long msg, long long salt, long module, int difficulty)
+    unsigned long long superDuperHashFunction(unsigned long long msg, unsigned long long salt, unsigned long long module, int difficulty)
     {
         for (int i = 0; i < difficulty; i++)
         {

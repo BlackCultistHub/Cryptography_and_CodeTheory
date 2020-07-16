@@ -2,15 +2,15 @@
 
 namespace RSA {
 
-    long long int keyGen(long long int p, long long int q, long long int& e, long long int& n, long long int& d)
+    unsigned long long int keyGen(unsigned long long int p, unsigned long long int q, unsigned long long int& e, unsigned long long int& n, unsigned long long int& d)
     {
-        int FermNumbers[5] = { 3, 5, 17, 257, 65537 };
-        long long int f;
+        int FermNumbers[5] = {65537, 257, 17, 5, 3};
+        unsigned long long int f;
         long long int x = 0;
         long long int y = 0;
         f = (p - 1) * (q - 1); //n eyler function 
         n = p * q;
-        for (int i = 4; i >= 0; i--)
+        for (int i = 0; i < 5; i++)
         {
             if (FermNumbers[i] < f)
             {
@@ -33,12 +33,12 @@ namespace RSA {
         return 0;
     }
 
-    long long int encript(long long int m, long long int e, long long int n)
+    unsigned long long int encript(unsigned long long int m, unsigned long long int e, unsigned long long int n)
     {
         return cryptoMath::modexp(m, e, n);
     }
 
-    long long int decript(long long int m, long long int d, long long int n)
+    unsigned long long int decript(unsigned long long int m, unsigned long long int d, unsigned long long int n)
     {
         return cryptoMath::modexp(m, d, n);
     }

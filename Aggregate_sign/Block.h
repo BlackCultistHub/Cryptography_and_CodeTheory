@@ -5,12 +5,12 @@ namespace BlockChain {
 
 	typedef struct block
 	{
-		block(std::vector<long long int>& transactions_, std::vector<long long int> key_ids_, long long sign_, long long int previous_block_id_, long long int block_id_);
-		long long int block_id;
-		long long int previous_block_id;
-		std::vector< long long int> transactions;
-		std::vector<long long int> key_ids;
-		long long int sign;
+		block(std::vector<unsigned long long int>& transactions_, std::vector<unsigned long long int> key_ids_, unsigned long long sign_, unsigned long long int previous_block_id_, unsigned long long int block_id_);
+		unsigned long long int block_id;
+		unsigned long long int previous_block_id;
+		std::vector<unsigned long long int> transactions;
+		std::vector<unsigned long long int> key_ids;
+		unsigned long long int sign;
 	} block;
 
 }

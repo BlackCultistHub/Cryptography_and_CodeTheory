@@ -2,7 +2,7 @@
 
 namespace BlockChain {
 
-	block::block(std::vector<long long int>& transactions_, std::vector<long long int> key_ids_, long long sign_, long long int previous_block_id_, long long int block_id_) :
+	block::block(std::vector<unsigned long long int>& transactions_, std::vector<unsigned long long int> key_ids_, unsigned long long sign_, unsigned long long int previous_block_id_, unsigned long long int block_id_) :
 		sign(sign_),
 		block_id(block_id_),
 		previous_block_id(previous_block_id_)
